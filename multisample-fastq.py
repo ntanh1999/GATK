@@ -18,21 +18,22 @@ out_vcf = os.path.join(out_dir,'vcf')
 ref_fasta = 'path_ref_fasta'
 dbsnp = 'path_dbsnp'
 
-input = pd.read_csv(open(input.tsv),sep='\t', dtype='str')
+input = pd.read_csv("input.tsv",sep='\t', dtype='str')
 input.fillna('', inplace=True)
 
-colection={}
-colection['samples'] = {}
-for i,row in input.interrows():
-    colection['samples'][row['name']]={}
-    colection['samples'][row['name']][row['group']]={} 
-    colection['samples'][row['name']][row['group']]['read1']=row['read1']
-    colection['samples'][row['name']][row['group']]['read2']=row['read2']
+collection={}
+collection['samples'] = {}
+for i,row in input.iterrows():
+    if row['name'] not in collection['samples'].keys():
+        collection['samples'][row['name']]={}
+    collection['samples'][row['name']][row['group']]={} 
+    collection['samples'][row['name']][row['group']]['read1']=row['read1']
+    collection['samples'][row['name']][row['group']]['read2']=row['read2']
 
 list_sample = []
-for sample_name in colection['samples']:
+for sample_name in collection['samples']:
     list_sample.append(sample_name)
-    sample=colection['samples'][sample_name]
+    sample=collection['samples'][sample_name]
     list_group = []
     for group_name in sample:
         group = sample[group_name]
@@ -58,7 +59,7 @@ for sample_name in colection['samples']:
                 -M {sample['metrics']} \
                 --TMP_DIR {tmp}"""
     for gn in list_group:
-        cmd += f'-I {sample[gn]['mappedbam']}'
+        cmd += f"-I {sample[gn]['mappedbam']}"
 
     #os.system(cmd)
 
@@ -83,7 +84,7 @@ for sample_name in colection['samples']:
     cmd = f"""gatk HaplotypeCaller \
                 -R {ref_fasta} \
                 -I {sample['arrbam']} \
-                -O {sample['vcf']} \
+                -O {sample['gvcf']} \
                 -ERC GVCF"""
     #os.system(cmd)
 
@@ -96,7 +97,7 @@ collection['genomicsdb'] = out_gdb
 cmd = f"""gatk GenomicsDBImport \
         --genomicsdb-workspace-path {collection['genomicsdb']}"""
 for i in list_sample:
-    cmd += f'-V {colection['samples'][i]['gvcf']}'
+    cmd += f"-V {collection['samples'][i]['gvcf']}"
 #os.system(cmd)
 
 collection['jointvcf'] = os.path.join(out_joint,'joint.vcf.gz')
@@ -105,5 +106,3 @@ cmd =f"""gatk GenotypeGVCFs
         -V {collection['genomicsdb']} \
         -O {collection['jointvcf']}"""
 #os.system(cmd) 
-
-#filter variants
