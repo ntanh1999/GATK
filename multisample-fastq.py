@@ -106,3 +106,5 @@ cmd =f"""gatk GenotypeGVCFs
         -V {collection['genomicsdb']} \
         -O {collection['jointvcf']}"""
 #os.system(cmd) 
+
+print(collection)

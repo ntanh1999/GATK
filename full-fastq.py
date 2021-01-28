@@ -140,3 +140,5 @@ cmd = f"""gatk FilterVariantTranches \
         --snp-tranche 99.9 \
         --indel-tranche 95.0"""
 #os.system(cmd)
+
+print (group)

@@ -1,0 +1,10 @@
+ssh vinbdi@10.124.69.34
+1
+
+cd /media/vinbdi/data/tienanh/
+
+scp D:\ubuntu\ADR\bestpractice\basic-fastq.py vinbdi@10.124.69.34:/media/vinbdi/data/tienanh/basic-fastq.py
+
+python3 basic-fastq.py
+
+nano basic-fastq.py
