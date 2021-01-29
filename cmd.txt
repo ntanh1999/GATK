@@ -1,10 +1,23 @@
 ssh vinbdi@10.124.69.34
 1
 
-cd /media/vinbdi/data/tienanh/
+cd /media/vinbdi/data/tienanh
 
 scp D:\ubuntu\ADR\bestpractice\basic-fastq.py vinbdi@10.124.69.34:/media/vinbdi/data/tienanh/basic-fastq.py
 
 python3 basic-fastq.py
 
 nano basic-fastq.py
+
+#tab character error
+"Lỗi do \t character khi python chuyển vào terminal sẽ chuyển thành      thật"
+
+bwa mem -M                 -t 20                 -R '@RG\tID:L001\tSM:NSAIDS_0011\tLB:lib1\tPL:ILLUMINA'                 /home/vinbdi/Desktop/ref38/hg38.fasta                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L001_ds.81df2cc1573849138d82f8230c815a67/NSAIDS-0011_S1_L001_R1_001.fastq.gz                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L001_ds.81df2cc1573849138d82f8230c815a67/NSAIDS-0011_S1_L001_R2_001.fastq.gz                 | samtools view -Shb -o /media/vinbdi/data/tienanh/gatk2/aln/NSAIDS_0011_L001_mapped.bam
+bwa mem -M                 -t 20                 -R '@RG\tID:L001\tSM:NSAIDS_0011\tLB:lib1\tPL:ILLUMINA'                 /home/vinbdi/Desktop/ref38/hg38.fasta                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L002_ds.be566a5456834aef871b632a3f6b327b/NSAIDS-0011_S1_L002_R1_001.fastq.gz                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L002_ds.be566a5456834aef871b632a3f6b327b/NSAIDS-0011_S1_L002_R2_001.fastq.gz                 | samtools view -Shb -o /media/vinbdi/data/tienanh/gatk2/aln/NSAIDS_0011_L002_mapped.bam
+bwa mem -M                 -t 20                 -R '@RG\tID:L001\tSM:NSAIDS_0011\tLB:lib1\tPL:ILLUMINA'                 /home/vinbdi/Desktop/ref38/hg38.fasta                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L003_ds.111556611a124592b9417420e504a5cf/NSAIDS-0011_S1_L003_R1_001.fastq.gz                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L003_ds.111556611a124592b9417420e504a5cf/NSAIDS-0011_S1_L003_R2_001.fastq.gz                 | samtools view -Shb -o /media/vinbdi/data/tienanh/gatk2/aln/NSAIDS_0011_L003_mapped.bam
+bwa mem -M                 -t 20                 -R '@RG\tID:L001\tSM:NSAIDS_0011\tLB:lib1\tPL:ILLUMINA'                 /home/vinbdi/Desktop/ref38/hg38.fasta                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L004_ds.baf99a87df4d48008907ae34c2d0e2b3/NSAIDS-0011_S1_L004_R1_001.fastq.gz                 /media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L004_ds.baf99a87df4d48008907ae34c2d0e2b3/NSAIDS-0011_S1_L004_R2_001.fastq.gz                 | samtools view -Shb -o /media/vinbdi/data/tienanh/gatk2/aln/NSAIDS_0011_L004_mapped.bam
+
+#check order
+#check readgroup
+samtools view -H NSAIDS_0011_L001_sorted.bam | grep '^@HD'
+samtools view -H NSAIDS_0011_L001_sorted.bam | grep '^@RG'

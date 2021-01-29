@@ -49,7 +49,7 @@ for group in sample['groups']:
     group['mbam']= os.path.join(out_aln,sample['name']+'_'+group['groupname']+'_mapped.bam')
     cmd = f"""bwa mem -M \
                 -t 20 \
-                -R @RG\tID:${group['groupname']}\tSM:${sample['name']}\tLB:lib1\tPL:ILLUMINA \
+                -R "@RG\tID:{group['groupname']}\tSM:{sample['name']}\tLB:lib1\tPL:ILLUMINA" \
                 {ref_fasta} \
                 {group['read1']} \
                 {group['read2']} \
