@@ -1,5 +1,5 @@
 #multi sample
-#from fastq
+#preprocessing + Calling Variants
 
 import os
 import pandas as pd
@@ -106,5 +106,3 @@ cmd =f"""gatk GenotypeGVCFs
         -V {collection['genomicsdb']} \
         -O {collection['jointvcf']}"""
 #os.system(cmd) 
-
-print(collection)

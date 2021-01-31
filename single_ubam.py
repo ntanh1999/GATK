@@ -1,5 +1,6 @@
 #single sample
 #convert to ubam and merge
+#Data processing + Calling variants
 
 import os
 
@@ -126,5 +127,3 @@ cmd = f"""gatk HaplotypeCaller \
             -O {group['vcf']}"""
 #os.system(cmd)
 
-
-print(sample)

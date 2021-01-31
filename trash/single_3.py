@@ -1,5 +1,5 @@
 #single sample
-#from fastq
+#Data processing + Calling variants + filtering
 
 import os
 
