@@ -41,51 +41,65 @@ for sample_name in collection['samples']:
 
         #map reads to reference
         group['mappedbam']= os.path.join(out_aln,sample_name+'_'+group_name+'_mapped.bam')
-        cmd = f"""bwa mem -M \
+        cmd = rf"""bwa mem -M \
                     -t 20 \
                     -R "@RG\tID:{group_name}\tSM:{sample_name}\tLB:lib1\tPL:ILLUMINA" \
                     {ref_fasta} \
                     {group['read1']} \
                     {group['read2']} \
                     | samtools view -Shb -o {group['mappedbam']}"""
+        print(cmd)
         #os.system(cmd)
-
+        
+        #sortbam
+        group['sortedbam']= os.path.join(out_aln,sample_name+'_'+group_name+'_sorted.bam')
+        cmd = rf"""gatk SortSam \
+                -I {group['mappedbam']} \
+                -O {group['sortedbam']} \
+                -SORT_ORDER coordinate \
+                --TMP_DIR {tmp}"""
+        print(cmd)
+        #os.system(cmd)
+    
     #mark duplicate
     sample['markedbam']= os.path.join(out_qual,sample_name+'_marked.bam')
     sample['metrics']= os.path.join(out_qual,sample_name+'_metrics.txt')
 
-    cmd = f"""gatk MarkDuplicates \
+    cmd = rf"""gatk MarkDuplicates \
                 -O {sample['markedbam']} \
                 -M {sample['metrics']} \
                 --TMP_DIR {tmp}"""
     for gn in list_group:
-        cmd += f"-I {sample[gn]['mappedbam']}"
-
+        cmd += rf"-I {sample[gn]['sortedbam']}"
+    print(cmd)
     #os.system(cmd)
 
     #base calibration
     sample['recaltable']= os.path.join(out_qual,sample_name+'_recal.table')
-    cmd = f"""gatk BaseRecalibrator \
+    cmd = rf"""gatk BaseRecalibrator \
             -I {sample['markedbam']} \
             -R {ref_fasta} \
             --known-sites {dbsnp} \
             -O {sample['recaltable']}"""
+    print(cmd)
     #os.system(cmd)
     sample['arrbam']= os.path.join(out_qual,sample_name+'_arr.bam')
-    cmd = f"""gatk ApplyBQSR \
+    cmd = rf"""gatk ApplyBQSR \
                 -R {ref_fasta} \
                 -I {sample['markedbam']} \
                 --bqsr-recal-file {sample['recaltable']} \
                 -O {sample['arrbam']}"""
+    print(cmd)
     #os.system(cmd)
 
     #variant calling
     sample['gvcf']= os.path.join(out_vcf,sample_name+'_g.vcf.gz')
-    cmd = f"""gatk HaplotypeCaller \
+    cmd = rf"""gatk HaplotypeCaller \
                 -R {ref_fasta} \
                 -I {sample['arrbam']} \
                 -O {sample['gvcf']} \
                 -ERC GVCF"""
+    print(cmd)
     #os.system(cmd)
 
 #consolidating GVCFs
@@ -94,15 +108,17 @@ out_joint = os.path.join(out_dir,'joint')
 out_gdb = os.path.join(out_joint,'genomicsdb')
 #os.mkdir(out_gdb)
 collection['genomicsdb'] = out_gdb
-cmd = f"""gatk GenomicsDBImport \
+cmd = rf"""gatk GenomicsDBImport \
         --genomicsdb-workspace-path {collection['genomicsdb']}"""
 for i in list_sample:
-    cmd += f"-V {collection['samples'][i]['gvcf']}"
+    cmd += f"  -V {collection['samples'][i]['gvcf']}"
+print(cmd)
 #os.system(cmd)
 
 collection['jointvcf'] = os.path.join(out_joint,'joint.vcf.gz')
-cmd =f"""gatk GenotypeGVCFs
+cmd =rf"""gatk GenotypeGVCFs
         -R {ref_fasta} \
         -V {collection['genomicsdb']} \
         -O {collection['jointvcf']}"""
+print(cmd)
 #os.system(cmd) 

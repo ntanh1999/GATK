@@ -43,43 +43,31 @@ sample['groups'].append({'groupname':'L004','read1':G4_R1,'read2':G4_R2})
 for group in sample['groups']:
     #map reads to reference
     group['mappedbam']= os.path.join(out_aln,sample['name']+'_'+group['groupname']+'_mapped.bam')
-    cmd = f"""bwa mem -M \
+    cmd = rf"""bwa mem -M \
                 -t 20 \
+                -R @RG\tID:{group['groupname']}\tSM:{sample['name']}\tLB:lib1\tPL:ILLUMINA \
                 {ref_fasta} \
                 {group['read1']} \
                 {group['read2']} \
                 | samtools view -Shb -o {group['mappedbam']}"""
-    print(f'RUNNING {cmd}')
-    #os.system(cmd)
-    
-    #add readgroup metadata
-    group['addedbam']= os.path.join(out_aln,sample['name']+'_'+group['groupname']+'_added.bam')
-    cmd = f"""gatk AddOrReplaceReadGroups \
-            -I {group['mappedbam']} \
-            -O {group['addedbam']} \
-            --RGID {group['groupname']} \
-            --RGSM {sample['name']} \
-            --RGLB lib1 \
-            --RGPU unit1 \
-            --RGPL ILLUMINA"""
-    print(f'RUNNING {cmd}')
+    print(cmd)
     #os.system(cmd)
             
     #sortbam
     group['sortedbam']= os.path.join(out_aln,sample['name']+'_'+group['groupname']+'_sorted.bam')
-    cmd = f"""gatk SortSam \
-            -I {group['addedbam']} \
+    cmd = rf"""gatk SortSam \
+            -I {group['mappedbam']} \
             -O {group['sortedbam']} \
             -SORT_ORDER coordinate \
             --TMP_DIR {tmp}"""
-    print(f'RUNNING {cmd}')
+    print(cmd)
     #os.system(cmd)
 
 #mark duplicate
 sample['markedbam']= os.path.join(out_qual,sample['name']+'_marked.bam')
 sample['metrics']= os.path.join(out_qual,sample['name']+'_metrics.txt')
 
-cmd = f"""gatk MarkDuplicates \
+cmd = rf"""gatk MarkDuplicates \
             -I {sample['groups'][0]['sortedbam']} \
             -I {sample['groups'][1]['sortedbam']} \
             -I {sample['groups'][2]['sortedbam']} \
@@ -92,7 +80,7 @@ print(f'RUNNING {cmd}')
 
 #base calibration
 sample['recaltable']= os.path.join(out_qual,sample['name']+'_recal.table')
-cmd = f"""gatk BaseRecalibrator \
+cmd = rf"""gatk BaseRecalibrator \
         -I {sample['markedbam']} \
         -R {ref_fasta} \
         --known-sites {dbsnp} \
@@ -101,7 +89,7 @@ print(f'RUNNING {cmd}')
 #os.system(cmd)
 
 sample['arrbam']= os.path.join(out_qual,sample['name']+'_arr.bam')
-cmd = f"""gatk ApplyBQSR \
+cmd = rf"""gatk ApplyBQSR \
             -R {ref_fasta} \
             -I {sample['markedbam']} \
             --bqsr-recal-file {sample['recaltable']} \
@@ -112,7 +100,7 @@ print(f'RUNNING {cmd}')
 #variant calling
 sample['vcf']= os.path.join(out_vcf,sample['name']+'.vcf')
 sample['bamout']= os.path.join(out_vcf,sample['name']+'out.bam')
-cmd = f"""gatk HaplotypeCaller \
+cmd = rf"""gatk HaplotypeCaller \
             -R {ref_fasta} \
             -I {sample['arrbam']} \
             -O {sample['vcf']} \
@@ -123,14 +111,14 @@ print(f'RUNNING {cmd}')
 #CNN_filtering
 #1D_CNN_filter
 sample['1d_cnn_scored_vcf']= os.path.join(out_fil,sample['name']+'1d_cnn_scored.vcf')
-cmd = f"""gatk CNNScoreVariants \
+cmd = rf"""gatk CNNScoreVariants \
         -R {ref_fasta} \
         -V {sample['vcf']} \
         -O {sample['1d_cnn_scored_vcf']}"""
 os.system(cmd)
 
 sample['1d_cnn_filtered_vcf']= os.path.join(out_fil,sample['name']+'1d_cnn_filtered.vcf')
-cmd = f"""gatk FilterVariantTranches \
+cmd = rf"""gatk FilterVariantTranches \
         -V {sample['1d_cnn_scored_vcf']} \
         -O {sample['1d_cnn_filtered_vcf']} \
         --resource {resource} \
@@ -141,7 +129,7 @@ cmd = f"""gatk FilterVariantTranches \
 
 #2D_CNN_filter
 sample['2d_cnn_scored_vcf']= os.path.join(out_fil,sample['name']+'2d_cnn_scored.vcf')
-cmd = f"""gatk CNNScoreVariants \
+cmd = rf"""gatk CNNScoreVariants \
         -R {ref_fasta} \
         -I {sample['bamout']} \
         -V {sample['vcf']} \
@@ -152,7 +140,7 @@ cmd = f"""gatk CNNScoreVariants \
 #os.system(cmd)
 
 sample['2d_cnn_filtered_vcf']= os.path.join(out_fil,sample['name']+'2d_cnn_filtered.vcf')
-cmd = f"""gatk FilterVariantTranches \
+cmd = rf"""gatk FilterVariantTranches \
         -V {sample['2d_cnn_scored_vcf']} \
         -O {sample['2d_cnn_filtered_vcf']} \
         --resource {resource} \
