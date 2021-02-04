@@ -5,22 +5,22 @@ import os
 
 #make directory 
 out_dir = "/media/vinbdi/data/tienanh/gatk"
-os.mkdir(out_dir)
+#os.mkdir(out_dir)
 out_aln = os.path.join(out_dir,'aln')
-os.mkdir(out_aln)
+#os.mkdir(out_aln)
 out_qual = os.path.join(out_dir,'qualification')
-os.mkdir(out_qual)
+#os.mkdir(out_qual)
 tmp = os.path.join(out_dir,'tmp')
-os.mkdir(tmp)
+#os.mkdir(tmp)
 out_vcf = os.path.join(out_dir,'vcf')
-os.mkdir(out_vcf)
+#os.mkdir(out_vcf)
 out_fil = os.path.join(out_dir,'filter')
-os.mkdir(out_fil)
+#os.mkdir(out_fil)
 
-#create varibles
+#create variables
 ref_fasta = '/home/vinbdi/Desktop/ref38/hg38.fasta'
 dbsnp = '/home/vinbdi/Desktop/ref38/resources-broad-hg38-v0-Homo_sapiens_assembly38.dbsnp138.vcf'
-resource = '/home/vinbdi/Desktop/ref38/resources-broad-hg38-v0-Homo_sapiens_assembly38.dbsnp138.vcf'
+resource = '???'
 
 G1_R1 = '/media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L001_ds.81df2cc1573849138d82f8230c815a67/NSAIDS-0011_S1_L001_R1_001.fastq.gz'
 G1_R2 = '/media/vinbdi/data/tienanh/NSAIDS_pilot/NSAIDS_0011_L001_ds.81df2cc1573849138d82f8230c815a67/NSAIDS-0011_S1_L001_R2_001.fastq.gz'
@@ -50,7 +50,7 @@ for group in sample['groups']:
                 {group['read2']} \
                 | samtools view -Shb -o {group['mappedbam']}"""
     print(f'RUNNING {cmd}')
-    os.system(cmd)
+    #os.system(cmd)
     
     #add readgroup metadata
     group['addedbam']= os.path.join(out_aln,sample['name']+'_'+group['groupname']+'_added.bam')
@@ -63,7 +63,7 @@ for group in sample['groups']:
             --RGPU unit1 \
             --RGPL ILLUMINA"""
     print(f'RUNNING {cmd}')
-    os.system(cmd)
+    #os.system(cmd)
             
     #sortbam
     group['sortedbam']= os.path.join(out_aln,sample['name']+'_'+group['groupname']+'_sorted.bam')
@@ -73,7 +73,7 @@ for group in sample['groups']:
             -SORT_ORDER coordinate \
             --TMP_DIR {tmp}"""
     print(f'RUNNING {cmd}')
-    os.system(cmd)
+    #os.system(cmd)
 
 #mark duplicate
 sample['markedbam']= os.path.join(out_qual,sample['name']+'_marked.bam')
@@ -88,7 +88,7 @@ cmd = f"""gatk MarkDuplicates \
             -M {sample['metrics']} \
             --TMP_DIR {tmp}"""
 print(f'RUNNING {cmd}')
-os.system(cmd)
+#os.system(cmd)
 
 #base calibration
 sample['recaltable']= os.path.join(out_qual,sample['name']+'_recal.table')
@@ -98,7 +98,7 @@ cmd = f"""gatk BaseRecalibrator \
         --known-sites {dbsnp} \
         -O {sample['recaltable']}"""
 print(f'RUNNING {cmd}')
-os.system(cmd)
+#os.system(cmd)
 
 sample['arrbam']= os.path.join(out_qual,sample['name']+'_arr.bam')
 cmd = f"""gatk ApplyBQSR \
@@ -118,7 +118,7 @@ cmd = f"""gatk HaplotypeCaller \
             -O {sample['vcf']} \
             -bamout {sample['bamout']}"""
 print(f'RUNNING {cmd}')
-os.system(cmd)
+#os.system(cmd)
 
 #CNN_filtering
 #1D_CNN_filter
@@ -127,7 +127,7 @@ cmd = f"""gatk CNNScoreVariants \
         -R {ref_fasta} \
         -V {sample['vcf']} \
         -O {sample['1d_cnn_scored_vcf']}"""
-#os.system(cmd)
+os.system(cmd)
 
 sample['1d_cnn_filtered_vcf']= os.path.join(out_fil,sample['name']+'1d_cnn_filtered.vcf')
 cmd = f"""gatk FilterVariantTranches \

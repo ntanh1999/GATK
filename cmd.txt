@@ -5,6 +5,9 @@ cd /media/vinbdi/data/tienanh
 
 scp D:\ubuntu\ADR\bestpractice\basic-fastq.py vinbdi@10.124.69.34:/media/vinbdi/data/tienanh/basic-fastq.py
 
+scp D:\ubuntu\ADR\data\* vinbdi@10.124.69.34:/media/vinbdi/data/tienanh/vep/*
+
+
 python3 basic-fastq.py
 
 nano basic-fastq.py
@@ -21,3 +24,31 @@ bwa mem -M                 -t 20                 -R '@RG\tID:L001\tSM:NSAIDS_001
 #check readgroup
 samtools view -H NSAIDS_0011_L001_sorted.bam | grep '^@HD'
 samtools view -H NSAIDS_0011_L001_sorted.bam | grep '^@RG'
+
+/mnt/d/ubuntu/ADR/data/NSAIDS_0011.vcf
+/mnt/d/ubuntu/ref/Homo_sapiens_assembly38.fasta
+/mnt/d/ubuntu/ref/Homo_sapiens_assembly38.dbsnp138.vcf
+
+
+./vep -i /media/vinbdi/data/tienanh/gatk/vcf/NSAIDS_0011.vcf -o /media/vinbdi/data/tienanh/gatk/vcf/NSAIDS_0011.txt -offline
+
+
+sudo chmod 666 /var/run/docker.sock
+/media/vinbdi/data/tienanh/vep 
+
+docker run -t -i -v /home/ted/ubuntu/ADR:/opt/vep/.vep ensemblorg/ensembl-vep
+
+perl INSTALL.pl -a cf -s homo_sapiens -y GRCh38
+
+./vep -i /media/vinbdi/data/tienanh/vep/NSAIDS_0011.1d_cnn_filtered.vcf -o /media/vinbdi/data/tienanh/vep/NSAIDS_0011.1d_cnn_filtered.txt --database
+
+
+#GATK docker
+docker run -t -i -v /home/ted/ubuntu/ADR:/gatk/my_data broadinstitute/gatk:4.1.3.0
+gatk CNNScoreVariants -R /gatk/my_data/ref/Homo_sapiens_assembly38.fasta -V /gatk/my_data/data/NSAIDS_0011.vcf -O /gatk/my_data/data/NSAIDS_0011.1d_cnn_scored.vcf
+gatk FilterVariantTranches -V /gatk/my_data/data/NSAIDS_0011.1d_cnn_scored.vcf -O /gatk/my_data/data/NSAIDS_0011.1d_cnn_filtered.vcf --resource /gatk/my_data/ref/1000G_omni2.5.hg38.vcf.gz --resource /gatk/my_data/ref/hapmap_3.3.hg38.vcf.gz --info-key CNN_1D --snp-tranche 99.9 --indel-tranche 95.0
+
+$HOME/vep0/  
+
+docker run -t -i -v /media/vinbdi/data/tienanh/vep:/opt/vep/.vep ensemblorg/ensembl-vep
+./vep -i /opt/vep/.vep/NSAIDS_0011.1d_cnn_filtered.vcf -o /opt/vep/.vep/NSAIDS_0011.1d_cnn_filtered.txt --offline
